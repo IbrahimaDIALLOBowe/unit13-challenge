@@ -89,7 +89,7 @@ def recommend_portfolio(intent_request):
     first_name = get_slots(intent_request)["firstName"]
     age = get_slots(intent_request)["age"]
     investment_amount = get_slots(intent_request)["investmentAmount"]
-    risk_level = get_slots(intent_request)["riskLevel"]
+    risk_level = get_slots(intent_request)["RIskLevel"]
     source = intent_request["invocationSource"]
 
     if source == "DialogCodeHook":
@@ -146,47 +146,46 @@ def recommend_portfolio(intent_request):
         },
     )
 
-### Data validation###
-
-def validate_data(age, investment_amount):
-    
+### Data Validation ###
+def validate_data(age, investmentAmount):
     """
-    Validates  the data provided by the user.
+    Validates the data provided by the user.
     """
-    age = int(age)
-    if age is None:
-        return build_validation_result(
-            False,
-            "age",
-            "The age must be less than 0. Please try again."
-            )
-    elif age <=0:
-        return build_validation_result(
-            False,
-            "age",
-            "The age must be less than 0. Please try again."
-            )
-    elif age>= 65:
-        return build_validation_result(
-        False,
-        "age",
-        "The age must be less than 0. Please try again."
-        )
-    investment_amount = float(investment_amount)
-    if investment_amount is None:
-        return build_validation_result(
-            False,
-            "investment_amount",
-            "The age must be less than 0. Please try again."
-            )
-    elif investment_amount < 5000:
-        return build_validation_result(
-            False,
-            "investment_amount",
-            "The investment amount must be greater than or equal to 5000. Please try again."
-            )
-    else:
+    # Handle default starting values - pass responsibility to the slots to retrieve values
+    if age is None and investmentAmount is None:
         return build_validation_result(True, None, None)
+    if age is not None:
+        # Validate age
+        if int(age) is None:
+            return build_validation_result(
+                False, "age", "Age must be a number. How old are you?"
+            )
+        age = int(age)
+        if age <= 0:
+            return build_validation_result(
+                False, "age", "Age must be greater than 0. How old are you?"
+            )
+        if age >= 65:
+            return build_validation_result(
+                False, "age", "Age must be less than 65. How old are you?"
+            )
+    if investmentAmount is not None:
+        # Validate investmentAmount
+        if float(investmentAmount) is None:
+            return build_validation_result(
+                False,
+                "investmentAmount",
+                "The investment amount must be a number. How much do you want to invest?",
+            )
+        investmentAmount = float(investmentAmount)
+        if investmentAmount < 5000:
+            return build_validation_result(
+                False,
+                "investmentAmount",
+                "The investment amount must be greater than or equal to 5000. How much do you want to invest?",
+            )
+    # Success!
+    return build_validation_result(True, None, None)
     
 
 
